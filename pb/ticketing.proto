@@ -38,21 +38,26 @@ enum Section {
 
 // Seat info
 message Seat {
-  string Section = 1;
+  Section section = 1;
   int32 number = 2;
 }
 
 // Purchase request message
 message PurchaseRequest {
+  User user = 1;
+}
+
+message Receipt {
   string from = 1;
   string to = 2;
   User user = 3;
   float price = 4;
+  Seat seat = 5;
 }
 
 // Purchase Response message
 message PurchaseResponse {
-  string Seat = 1;
+  Receipt receipt = 1;
 }
 
 // View Reservation Request message

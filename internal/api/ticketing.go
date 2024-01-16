@@ -24,6 +24,7 @@ func (ts *TicketingServer) RegisterService(g grpc.ServiceRegistrar) {
 
 func (s *TicketingServer) Purchase(ctx context.Context, in *pb.PurchaseRequest) (*pb.PurchaseResponse, error) {
 	log.Printf("Received: %v", in)
+
 	return nil, status.Errorf(codes.PermissionDenied, "denied")
 }
 
