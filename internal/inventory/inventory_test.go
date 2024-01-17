@@ -7,12 +7,15 @@ import (
 func TestPurchase(t *testing.T) {
 	inv := NewInventory()
 
-	// Test case 1: Purchase a seat in section "a"
-	receipt, err := inv.Purchase("Brandon", "Stewart", "bkstewart@gmail.com")
-	if err != nil {
-		t.Errorf("Error purchasing seat: %v", err)
+	for i := 0; i < 20; i++ {
+		receipt, err := inv.Purchase("B", "S", "a@b.com")
+		if err != nil {
+			t.Errorf("Error purchasing seat: %v", err)
+		}
+
+		t.Log(receipt)
 	}
 
-	t.Log(receipt)
-
+	_, err := inv.Purchase("B", "S", "dfd")
+	t.Log(err)
 }

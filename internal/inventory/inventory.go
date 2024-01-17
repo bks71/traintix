@@ -1,9 +1,9 @@
 package inventory
 
-import (
+import "errors"
+
 // "fmt"
 // "os"
-)
 
 // Define sections as arrays of users. Array index is equivalent to seat number.
 type Section struct {
@@ -70,5 +70,5 @@ func (inv *Inventory) Purchase(firstName string, lastName string, email string) 
 		// 	return &pb.Receipt{Seat: i, Section: "a"}, nil
 		// }
 	}
-	return Receipt{}, nil
+	return Receipt{}, errors.New("No seats available")
 }
