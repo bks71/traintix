@@ -30,16 +30,10 @@ message User {
   string email = 3;
 }
 
-// Seating sections
-enum Section {
-  A = 0;
-  B = 1;
-}
-
 // Seat info
 message Seat {
-  Section section = 1;
-  int32 number = 2;
+  int32 seat_number = 1;
+  string section = 2;
 }
 
 // Purchase request message
@@ -62,29 +56,29 @@ message PurchaseResponse {
 
 // View Reservation Request message
 message ViewReservationRequest {
-  string User = 1;
+  string user = 1;
 }
 
 // View Reservation Response message
 message ViewReservationResponse {
-  string Seat = 1;
+  string seat = 1;
   float price = 2; 
 }
 
 // View All Reservations Request message
 message ViewAllReservationsRequest {
-  string Section = 1;
+  string section = 1;
 }
 
 // View All Reservations Response message
 message ViewAllReservationsResponse {
-  repeated Seat Seat = 1;
-  repeated User User = 2;
+  repeated Seat seat = 1;
+  repeated User user = 2;
 }
 
 // Cancel Reservation Request message
 message CancelReservationRequest {
-  string User = 1;
+  User user = 1;
 }
 
 // Cancel Reservation Response message
@@ -93,8 +87,8 @@ message CancelReservationResponse {
 
 // Change Seat Request message
 message ChangeSeatRequest {
-  string User = 1;
-  string Seat = 2; //new seat
+  User user = 1;
+  Seat seat = 2; //new seat
 }
 
 // Change Seat Response message

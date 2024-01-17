@@ -2,9 +2,6 @@ package inventory
 
 import "errors"
 
-// "fmt"
-// "os"
-
 // Define sections as arrays of users. Array index is equivalent to seat number.
 type Section struct {
 	name         string
@@ -15,60 +12,51 @@ type Inventory struct {
 	sections []*Section
 }
 
-type Reservation struct {
+type Passenger struct {
 	FirstName string
 	LastName  string
 	Email     string
 }
 
-type Receipt struct {
-	From        string
-	To          string
-	Reservation Reservation
-	Section     string
-	Seat        int
-	Price       float32
+type Reservation struct {
+	From       string
+	To         string
+	Passenger  Passenger
+	Section    string
+	SeatNumber int
+	Price      float32
 }
 
 func NewInventory() *Inventory {
 	return &Inventory{
 		sections: []*Section{
-			{name: "a", reservations: make([]*Reservation, 10)},
-			{name: "b", reservations: make([]*Reservation, 10)},
+			{name: "A", reservations: make([]*Reservation, 10)},
+			{name: "B", reservations: make([]*Reservation, 10)},
 		},
 	}
 
 }
 
-func (inv *Inventory) Purchase(firstName string, lastName string, email string) (Receipt, error) {
+func (inv *Inventory) Purchase(firstName string, lastName string, email string) (Reservation, error) {
+	p := Passenger{FirstName: firstName, LastName: lastName, Email: email}
 	for _, section := range inv.sections {
 		for j, resv := range section.reservations {
-			// fmt.Fprint(os.Stdout, i, j, resv)
-			if resv == nil {
-				r := &Reservation{
-					FirstName: firstName,
-					LastName:  lastName,
-					Email:     email,
+			if resv != nil && resv.Passenger == p {
+				return Reservation{}, errors.New("sorry you already have a reservation")
+			} else if resv == nil {
+				r := Reservation{
+					From:       "London",
+					To:         "France",
+					Passenger:  p,
+					Section:    section.name,
+					SeatNumber: j,
+					Price:      20.00,
 				}
-				section.reservations[j] = r
-				return Receipt{
-					From:        "London",
-					To:          "France",
-					Reservation: *r,
-					Section:     section.name,
-					Seat:        j,
-					Price:       20.00,
-				}, nil
+
+				section.reservations[j] = &r
+				return r, nil
 			}
-			// if user == nil {
-			// 	section.seats[j] = user
-			// 	return pb.Receipt{Seat: j, Section: section.name}, nil
-			// }
 		}
-		// if  == nil {
-		// 	i.a[i] = user
-		// 	return &pb.Receipt{Seat: i, Section: "a"}, nil
-		// }
 	}
-	return Receipt{}, errors.New("No seats available")
+	return Reservation{}, errors.New("no seats available")
 }

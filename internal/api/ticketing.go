@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 
+	"github.com/bks71/traintix/internal/inventory"
 	"github.com/bks71/traintix/pb"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -22,10 +23,32 @@ func (ts *TicketingServer) RegisterService(g grpc.ServiceRegistrar) {
 	pb.RegisterTicketingServer(g, ts)
 }
 
-func (s *TicketingServer) Purchase(ctx context.Context, in *pb.PurchaseRequest) (*pb.PurchaseResponse, error) {
-	log.Printf("Received: %v", in)
+var inv = inventory.NewInventory()
 
-	return nil, status.Errorf(codes.PermissionDenied, "denied")
+func (s *TicketingServer) Purchase(ctx context.Context, in *pb.PurchaseRequest) (*pb.PurchaseResponse, error) {
+	log.Printf("%v", in)
+	resv, err := inv.Purchase(in.User.FirstName, in.User.LastName, in.User.Email)
+	if err != nil {
+		return nil, err
+	}
+
+	log.Printf("%v", resv)
+
+	resp := &pb.PurchaseResponse{
+		Receipt: &pb.Receipt{
+			From:  resv.From,
+			To:    resv.To,
+			User:  &pb.User{FirstName: resv.Passenger.FirstName, LastName: resv.Passenger.LastName, Email: resv.Passenger.Email},
+			Price: resv.Price,
+			// Seat:  &pb.Seat{SeatNumber: int32(resv.SeatNumber)},
+			Seat: &pb.Seat{Section: resv.Section, SeatNumber: int32(resv.SeatNumber)},
+		},
+	}
+
+	log.Printf("%v", resp)
+
+	return resp, nil
+
 }
 
 func (s *TicketingServer) ViewReservation(ctx context.Context, in *pb.ViewReservationRequest) (*pb.ViewReservationResponse, error) {
