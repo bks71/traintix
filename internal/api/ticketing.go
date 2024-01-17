@@ -13,21 +13,22 @@ import (
 
 type TicketingServer struct {
 	pb.UnimplementedTicketingServer
+	inventory.InventoryService
 }
 
 func NewTicketingServer() (*TicketingServer, error) {
-	return &TicketingServer{}, nil
+	return &TicketingServer{
+		InventoryService: inventory.NewInventory(),
+	}, nil
 }
 
 func (ts *TicketingServer) RegisterService(g grpc.ServiceRegistrar) {
 	pb.RegisterTicketingServer(g, ts)
 }
 
-var inv = inventory.NewInventory()
-
 func (s *TicketingServer) Purchase(ctx context.Context, in *pb.PurchaseRequest) (*pb.PurchaseResponse, error) {
 	log.Printf("%v", in)
-	resv, err := inv.Purchase(in.User.FirstName, in.User.LastName, in.User.Email)
+	resv, err := s.InventoryService.Purchase(in.User.FirstName, in.User.LastName, in.User.Email)
 	if err != nil {
 		return nil, err
 	}

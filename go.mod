@@ -3,6 +3,7 @@ module github.com/bks71/traintix
 go 1.21.5
 
 require (
+	github.com/golang/mock v1.6.0
 	github.com/stretchr/testify v1.8.4
 	google.golang.org/grpc v1.60.1
 	google.golang.org/protobuf v1.32.0
