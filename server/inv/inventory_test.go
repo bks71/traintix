@@ -1,4 +1,4 @@
-package inventory
+package inv
 
 import (
 	"fmt"
@@ -17,7 +17,7 @@ func TestPurchase(t *testing.T) {
 			fname := rand.HumanFriendlyString(5)
 			lname := rand.HumanFriendlyString(5)
 			email := fmt.Sprintf("%s@trainz.com", rand.HumanFriendlyString(5))
-			resv, err := inv.Purchase(fname, lname, email)
+			resv, err := inv.ReserveSeat(fname, lname, email)
 			if err != nil {
 				t.Errorf("Error purchasing seat: %v", err)
 			}
@@ -44,7 +44,7 @@ func TestPurchase(t *testing.T) {
 		}
 
 		// check for error when train is full
-		_, err := inv.Purchase("B", "S", "dfd")
+		_, err := inv.ReserveSeat("B", "S", "dfd")
 		assert.Error(t, err)
 
 		t.Log(err)

@@ -1,4 +1,4 @@
-package inventory
+package inv
 
 import "errors"
 
@@ -37,7 +37,7 @@ func NewInventory() *Inventory {
 
 }
 
-func (inv *Inventory) Purchase(firstName string, lastName string, email string) (Reservation, error) {
+func (inv *Inventory) ReserveSeat(firstName string, lastName string, email string) (Reservation, error) {
 	p := Passenger{FirstName: firstName, LastName: lastName, Email: email}
 	for _, section := range inv.sections {
 		for j, resv := range section.reservations {

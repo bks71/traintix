@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/bks71/traintix/pb"
-	"github.com/bks71/traintix/server/inventory"
+	"github.com/bks71/traintix/server/inv"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
@@ -24,21 +24,21 @@ func TestPurchase(t *testing.T) {
 		Email:     "bkstewart@gmail.com",
 	}
 
-	inv := inventory.NewMockInventoryService(ctrl)
+	mockInv := inv.NewMockInventoryService(ctrl)
 
 	server := &TicketingServer{
-		InventoryService: inv,
+		InventoryService: mockInv,
 	}
 
-	resv := inventory.Reservation{
+	resv := inv.Reservation{
 		From:       "Here",
 		To:         "There",
-		Passenger:  inventory.Passenger{FirstName: user.FirstName, LastName: user.LastName, Email: user.Email},
+		Passenger:  inv.Passenger{FirstName: user.FirstName, LastName: user.LastName, Email: user.Email},
 		Section:    "X",
 		SeatNumber: 100,
 		Price:      2000.00}
 
-	inv.EXPECT().Purchase(user.FirstName, user.LastName, user.Email).Return(resv, nil)
+	mockInv.EXPECT().ReserveSeat(user.FirstName, user.LastName, user.Email).Return(resv, nil)
 
 	// Create a purchase request
 	req := &pb.PurchaseRequest{

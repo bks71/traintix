@@ -5,7 +5,7 @@ import (
 	"log"
 
 	"github.com/bks71/traintix/pb"
-	"github.com/bks71/traintix/server/inventory"
+	"github.com/bks71/traintix/server/inv"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -13,12 +13,12 @@ import (
 
 type TicketingServer struct {
 	pb.UnimplementedTicketingServer
-	inventory.InventoryService
+	inv.InventoryService
 }
 
 func NewTicketingServer() (*TicketingServer, error) {
 	return &TicketingServer{
-		InventoryService: inventory.NewInventory(),
+		InventoryService: inv.NewInventory(),
 	}, nil
 }
 
@@ -28,7 +28,7 @@ func (ts *TicketingServer) RegisterService(g grpc.ServiceRegistrar) {
 
 func (s *TicketingServer) Purchase(ctx context.Context, in *pb.PurchaseRequest) (*pb.PurchaseResponse, error) {
 	log.Printf("%v", in)
-	resv, err := s.InventoryService.Purchase(in.User.FirstName, in.User.LastName, in.User.Email)
+	resv, err := s.InventoryService.ReserveSeat(in.User.FirstName, in.User.LastName, in.User.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -41,8 +41,7 @@ func (s *TicketingServer) Purchase(ctx context.Context, in *pb.PurchaseRequest) 
 			To:    resv.To,
 			User:  &pb.User{FirstName: resv.Passenger.FirstName, LastName: resv.Passenger.LastName, Email: resv.Passenger.Email},
 			Price: resv.Price,
-			// Seat:  &pb.Seat{SeatNumber: int32(resv.SeatNumber)},
-			Seat: &pb.Seat{Section: resv.Section, SeatNumber: int32(resv.SeatNumber)},
+			Seat:  &pb.Seat{Section: resv.Section, SeatNumber: int32(resv.SeatNumber)},
 		},
 	}
 
@@ -53,21 +52,21 @@ func (s *TicketingServer) Purchase(ctx context.Context, in *pb.PurchaseRequest) 
 }
 
 func (s *TicketingServer) ViewReservation(ctx context.Context, in *pb.ViewReservationRequest) (*pb.ViewReservationResponse, error) {
-	log.Printf("Received: %v", in)
+	log.Printf("%v", in)
 	return nil, status.Errorf(codes.PermissionDenied, "denied")
 }
 
 func (s *TicketingServer) ViewAllReservations(ctx context.Context, in *pb.ViewAllReservationsRequest) (*pb.ViewAllReservationsResponse, error) {
-	log.Printf("Received: %v", in)
+	log.Printf("%v", in)
 	return nil, status.Errorf(codes.PermissionDenied, "denied")
 }
 
 func (s *TicketingServer) ChangeSeat(ctx context.Context, in *pb.ChangeSeatRequest) (*pb.ChangeSeatResponse, error) {
-	log.Printf("Received: %v", in)
+	log.Printf("%v", in)
 	return nil, status.Errorf(codes.PermissionDenied, "denied")
 }
 
 func (s *TicketingServer) CancelReservation(ctx context.Context, in *pb.CancelReservationRequest) (*pb.CancelReservationResponse, error) {
-	log.Printf("Received: %v", in)
+	log.Printf("%v", in)
 	return nil, status.Errorf(codes.PermissionDenied, "denied")
 }
