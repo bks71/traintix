@@ -6,7 +6,8 @@ import (
 	"log"
 	"net"
 
-	"github.com/bks71/traintix/internal/server"
+	"github.com/bks71/traintix/server/api"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -20,13 +21,21 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	grpcSrv := server.NewGRPCServer()
+	//create grpc server
+	grpcServer := grpc.NewServer()
+
+	//register Ticketing API server
+	if ts, err := api.NewTicketingServer(); err == nil {
+		ts.RegisterService(grpcServer)
+	} else {
+		log.Fatalf("unable to register TicketingServer %v", err)
+	}
 
 	// Register reflection service on gRPC server.
-	reflection.Register(grpcSrv)
+	reflection.Register(grpcServer)
 
 	log.Printf("server listening at %v", lis.Addr())
-	if err := grpcSrv.Serve(lis); err != nil {
+	if err := grpcServer.Serve(lis); err != nil {
 		log.Fatalf("failed to serve: %v", err)
 	}
 }

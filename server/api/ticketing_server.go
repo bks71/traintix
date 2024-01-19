@@ -4,8 +4,8 @@ import (
 	"context"
 	"log"
 
-	"github.com/bks71/traintix/internal/inventory"
 	"github.com/bks71/traintix/pb"
+	"github.com/bks71/traintix/server/inventory"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
