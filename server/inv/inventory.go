@@ -1,15 +1,25 @@
 package inv
 
-import "errors"
+import (
+	"errors"
+)
 
-// Define sections as arrays of users. Array index is equivalent to seat number.
-type Section struct {
-	name         string
-	reservations []*Reservation
+// Inventory is a map of section name (A/B) to Section
+type Inventory struct {
+	// sections []*Section
+	sections map[string]*Section
 }
 
-type Inventory struct {
-	sections []*Section
+// Define a sections as an array of seats. If nil, seat is not reserved. Array index is equivalent to seat number.
+type Section struct {
+	seats []*Reservation
+}
+
+type Reservation struct {
+	From      string
+	To        string
+	Passenger Passenger
+	Price     float32
 }
 
 type Passenger struct {
@@ -18,42 +28,31 @@ type Passenger struct {
 	Email     string
 }
 
-type Reservation struct {
-	From       string
-	To         string
-	Passenger  Passenger
-	Section    string
-	SeatNumber int
-	Price      float32
-}
-
 func NewInventory() *Inventory {
-	return &Inventory{
-		sections: []*Section{
-			{name: "A", reservations: make([]*Reservation, 10)},
-			{name: "B", reservations: make([]*Reservation, 10)},
-		},
-	}
-
+	s := make(map[string]*Section)
+	s["A"] = &Section{seats: make([]*Reservation, 10)}
+	s["B"] = &Section{seats: make([]*Reservation, 10)}
+	return &Inventory{sections: s}
 }
 
-func (inv *Inventory) ReserveSeat(firstName string, lastName string, email string) (Reservation, error) {
-	p := Passenger{FirstName: firstName, LastName: lastName, Email: email}
+// TODO signature - use Passenger struct
+func (inv *Inventory) ReserveSeat(p Passenger) (Reservation, error) {
+
+	//TODO check for existing reservation first
+
 	for _, section := range inv.sections {
-		for j, resv := range section.reservations {
+		for j, resv := range section.seats {
 			if resv != nil && resv.Passenger == p {
 				return Reservation{}, errors.New("sorry you already have a reservation")
 			} else if resv == nil {
 				r := Reservation{
-					From:       "London",
-					To:         "France",
-					Passenger:  p,
-					Section:    section.name,
-					SeatNumber: j,
-					Price:      20.00,
+					From:      "London",
+					To:        "France",
+					Passenger: p,
+					Price:     20.00,
 				}
 
-				section.reservations[j] = &r
+				section.seats[j] = &r
 				return r, nil
 			}
 		}
