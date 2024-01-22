@@ -35,11 +35,12 @@ func (m *MockReservationSystem) EXPECT() *MockReservationSystemMockRecorder {
 }
 
 // CancelReservation mocks base method.
-func (m *MockReservationSystem) CancelReservation(arg0 *pb.Passenger) error {
+func (m *MockReservationSystem) CancelReservation(arg0 *pb.Passenger) (*pb.Reservation, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CancelReservation", arg0)
-	ret0, _ := ret[0].(error)
-	return ret0
+	ret0, _ := ret[0].(*pb.Reservation)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // CancelReservation indicates an expected call of CancelReservation.

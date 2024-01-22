@@ -2,7 +2,6 @@ package reservations
 
 import (
 	"errors"
-	"log"
 
 	"github.com/bks71/traintix/pb"
 )
@@ -105,14 +104,22 @@ func (resv *ResvSys) GetReservation(p *pb.Passenger) (*pb.Reservation, error) {
 	return nil, errors.New("no reservation found")
 }
 
-func (resv *ResvSys) CancelReservation(p *pb.Passenger) error {
+func (resv *ResvSys) CancelReservation(p *pb.Passenger) (*pb.Reservation, error) {
 	if r, exists := resv.passengers[p.Email]; exists {
 		//TODO test this
+
+		// put the seat back into the inventory
 		resv.openSeats = append(resv.openSeats, r.Seat)
+
+		// remove the passenger/reservation from the map
 		delete(resv.passengers, p.Email)
-		return nil
+
+		// remove the passenger from the reservation and return it
+		r.Passenger = nil
+		return r, nil
 	}
-	return errors.New("no reservation found")
+
+	return nil, errors.New("no reservation found")
 }
 
 func (resv *ResvSys) ChangeSeat(p *pb.Passenger, s *pb.Seat) (*pb.Reservation, error) {
@@ -126,19 +133,14 @@ func (resv *ResvSys) ChangeSeat(p *pb.Passenger, s *pb.Seat) (*pb.Reservation, e
 		return r, errors.New("passenger has already reserved this seat")
 	}
 
-	log.Printf("%v", s)
 	for i, v := range resv.openSeats {
-		log.Printf("%v", v)
 		if v.Number == s.Number && v.Section == s.Section {
 			// put old seat back into the inventory and switch passenger to new seat
 			resv.openSeats[i] = r.Seat
 			r.Seat = s
 			return r, nil
 		}
-		log.Printf("%v", v)
 	}
-
-	log.Printf("%v", resv.openSeats)
 
 	return r, errors.New("seat not available")
 }

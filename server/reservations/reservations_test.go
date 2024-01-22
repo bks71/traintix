@@ -77,10 +77,12 @@ func TestResvSystem(t *testing.T) {
 			t.Errorf("Error reserving a seat: %v", err)
 		}
 
-		err = resv.CancelReservation(p)
+		r, err := resv.CancelReservation(p)
 		if err != nil {
 			t.Errorf("Error canceling a reservation: %v", err)
 		}
+
+		assert.True(t, r.Passenger == nil)
 	})
 
 	t.Run("Reservation not found", func(t *testing.T) {
@@ -92,7 +94,7 @@ func TestResvSystem(t *testing.T) {
 		t.Log(errGet)
 
 		// check for error on cancel
-		errCancel := resv.CancelReservation(randomPassenger())
+		_, errCancel := resv.CancelReservation(randomPassenger())
 		assert.Error(t, errCancel)
 		t.Log(errCancel)
 	})

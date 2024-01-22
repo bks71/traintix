@@ -7,8 +7,6 @@ import (
 	"github.com/bks71/traintix/pb"
 	"github.com/bks71/traintix/server/reservations"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 )
 
 type TicketingServer struct {
@@ -47,20 +45,64 @@ func (s *TicketingServer) Purchase(ctx context.Context, in *pb.PurchaseRequest) 
 func (s *TicketingServer) GetReservation(ctx context.Context, in *pb.GetReservationRequest) (*pb.TicketingResponse, error) {
 	log.Printf("%v", in)
 
-	return nil, status.Errorf(codes.PermissionDenied, "denied")
+	r, err := s.ReservationSystem.GetReservation(in.Passenger)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &pb.TicketingResponse{
+		Reservation: []*pb.Reservation{r},
+	}
+
+	log.Printf("%v", resp)
+
+	return resp, nil
 }
 
 func (s *TicketingServer) GetReservationsBySection(ctx context.Context, in *pb.GetReservationsBySectionRequest) (*pb.TicketingResponse, error) {
 	log.Printf("%v", in)
-	return nil, status.Errorf(codes.PermissionDenied, "denied")
+
+	r := s.ReservationSystem.GetReservationsBySection(in.Section)
+
+	resp := &pb.TicketingResponse{
+		Reservation: r,
+	}
+
+	log.Printf("%v", resp)
+
+	return resp, nil
 }
 
 func (s *TicketingServer) ChangeSeat(ctx context.Context, in *pb.ChangeSeatRequest) (*pb.TicketingResponse, error) {
 	log.Printf("%v", in)
-	return nil, status.Errorf(codes.PermissionDenied, "denied")
+
+	r, err := s.ReservationSystem.ChangeSeat(in.Passenger, in.Seat)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &pb.TicketingResponse{
+		Reservation: []*pb.Reservation{r},
+	}
+
+	log.Printf("%v", resp)
+
+	return resp, nil
 }
 
 func (s *TicketingServer) CancelReservation(ctx context.Context, in *pb.CancelReservationRequest) (*pb.TicketingResponse, error) {
 	log.Printf("%v", in)
-	return nil, status.Errorf(codes.PermissionDenied, "denied")
+
+	r, err := s.ReservationSystem.CancelReservation(in.Passenger)
+	if err != nil {
+		return nil, err
+	}
+
+	resp := &pb.TicketingResponse{
+		Reservation: []*pb.Reservation{r},
+	}
+
+	log.Printf("%v", resp)
+
+	return resp, nil
 }
