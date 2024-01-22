@@ -2,76 +2,81 @@ package reservations
 
 import (
 	"errors"
+	"log"
+
+	"github.com/bks71/traintix/pb"
 )
 
-var inventory = []Seat{
-	{section: "A", number: 1},
-	{section: "A", number: 2},
-	{section: "A", number: 3},
-	{section: "A", number: 4},
-	{section: "A", number: 5},
-	{section: "A", number: 6},
-	{section: "A", number: 7},
-	{section: "A", number: 8},
-	{section: "A", number: 9},
-	{section: "A", number: 10},
-	{section: "B", number: 1},
-	{section: "B", number: 2},
-	{section: "B", number: 3},
-	{section: "B", number: 4},
-	{section: "B", number: 5},
-	{section: "B", number: 6},
-	{section: "B", number: 7},
-	{section: "B", number: 8},
-	{section: "B", number: 9},
-	{section: "B", number: 10},
-}
+// type Seat struct {
+// 	Section string
+// 	Number  int
+// }
 
-type Seat struct {
-	section string
-	number  int
-}
+// type Reservation struct {
+// 	Passenger Passenger
+// 	From      string
+// 	To        string
+// 	Price     float32
+// 	Seat      Seat
+// }
 
-type Reservation struct {
-	From  string
-	To    string
-	Price float32
-	Seat  Seat
-}
-
-type Passenger struct {
-	FirstName string
-	LastName  string
-	Email     string
-}
+// type Passenger struct {
+// 	FirstName string
+// 	LastName  string
+// 	Email     string
+// }
 
 type ResvSys struct {
-	inventory  []Seat
-	passengers map[Passenger]Reservation
+	// Available seats
+	openSeats []*pb.Seat
+
+	// Map of emails to reservations
+	passengers map[string]*pb.Reservation
 }
 
 func NewReservationSystem() *ResvSys {
 	return &ResvSys{
-		inventory:  inventory,
-		passengers: make(map[Passenger]Reservation),
+		openSeats: []*pb.Seat{
+			{Section: "A", Number: 1},
+			{Section: "A", Number: 2},
+			{Section: "A", Number: 3},
+			{Section: "A", Number: 4},
+			{Section: "A", Number: 5},
+			{Section: "A", Number: 6},
+			{Section: "A", Number: 7},
+			{Section: "A", Number: 8},
+			{Section: "A", Number: 9},
+			{Section: "A", Number: 10},
+			{Section: "B", Number: 1},
+			{Section: "B", Number: 2},
+			{Section: "B", Number: 3},
+			{Section: "B", Number: 4},
+			{Section: "B", Number: 5},
+			{Section: "B", Number: 6},
+			{Section: "B", Number: 7},
+			{Section: "B", Number: 8},
+			{Section: "B", Number: 9},
+			{Section: "B", Number: 10},
+		},
+		passengers: make(map[string]*pb.Reservation),
 	}
 }
 
-func (resv *ResvSys) reserveAnySeat() (Seat, error) {
-	if len(resv.inventory) == 0 {
-		return Seat{}, errors.New("no seats available")
+func (resv *ResvSys) reserveAnySeat() (*pb.Seat, error) {
+	if len(resv.openSeats) == 0 {
+		return nil, errors.New("no seats available")
 	}
-	i := resv.inventory
+	i := resv.openSeats
 	s := i[len(i)-1]
-	resv.inventory = i[:len(i)-1]
+	resv.openSeats = i[:len(i)-1]
 	return s, nil
 }
 
-func (resv *ResvSys) ReserveSeat(p Passenger) (*Reservation, error) {
+func (resv *ResvSys) ReserveSeat(p *pb.Passenger) (*pb.Reservation, error) {
 
 	//check for an existing reservation for this passenger
-	if r, exists := resv.passengers[p]; exists {
-		return &r, errors.New("sorry you already have a reservation")
+	if r, exists := resv.passengers[p.Email]; exists {
+		return r, errors.New("sorry this email address already has a reservation")
 	}
 
 	//Find an empty seat
@@ -81,46 +86,69 @@ func (resv *ResvSys) ReserveSeat(p Passenger) (*Reservation, error) {
 	}
 
 	//Reserve it
-	r := Reservation{From: "London", To: "France", Price: 20.00, Seat: s}
-	resv.passengers[p] = r
+	r := pb.Reservation{
+		Passenger: p,
+		From:      "London",
+		To:        "France",
+		Price:     20.00,
+		Seat:      s,
+	}
+	resv.passengers[p.Email] = &r
 
 	return &r, nil
 }
 
-func (resv *ResvSys) GetReservation(p Passenger) (*Reservation, error) {
-	if r, exists := resv.passengers[p]; exists {
-		return &r, nil
+func (resv *ResvSys) GetReservation(p *pb.Passenger) (*pb.Reservation, error) {
+	if r, exists := resv.passengers[p.Email]; exists {
+		return r, nil
 	}
 	return nil, errors.New("no reservation found")
 }
 
-func (resv *ResvSys) CancelReservation(p Passenger) error {
-	if _, exists := resv.passengers[p]; exists {
-		delete(resv.passengers, p)
+func (resv *ResvSys) CancelReservation(p *pb.Passenger) error {
+	if r, exists := resv.passengers[p.Email]; exists {
+		//TODO test this
+		resv.openSeats = append(resv.openSeats, r.Seat)
+		delete(resv.passengers, p.Email)
 		return nil
 	}
 	return errors.New("no reservation found")
 }
 
-func (resv *ResvSys) ChangeSeat(p Passenger, s Seat) (*Reservation, error) {
+func (resv *ResvSys) ChangeSeat(p *pb.Passenger, s *pb.Seat) (*pb.Reservation, error) {
 
-	r, exists := resv.passengers[p]
+	r, exists := resv.passengers[p.Email]
 	if !exists {
-		return nil, errors.New("no reservation found for this passenger")
+		return nil, errors.New("no reservation found for this email address")
 	}
 
 	if r.Seat == s {
-		return &r, errors.New("passenger has already reserved this seat")
+		return r, errors.New("passenger has already reserved this seat")
 	}
 
-	for i, v := range resv.inventory {
-		if v == s {
+	log.Printf("%v", s)
+	for i, v := range resv.openSeats {
+		log.Printf("%v", v)
+		if v.Number == s.Number && v.Section == s.Section {
 			// put old seat back into the inventory and switch passenger to new seat
-			resv.inventory[i] = r.Seat
+			resv.openSeats[i] = r.Seat
 			r.Seat = s
-			return &r, nil
+			return r, nil
+		}
+		log.Printf("%v", v)
+	}
+
+	log.Printf("%v", resv.openSeats)
+
+	return r, errors.New("seat not available")
+}
+
+func (resv *ResvSys) GetReservationsBySection(sectionName string) []*pb.Reservation {
+	var res []*pb.Reservation
+	for _, r := range resv.passengers {
+		if r.Seat.Section == sectionName {
+			res = append(res, r)
 		}
 	}
-
-	return nil, errors.New("seat not available")
+	return res
 }

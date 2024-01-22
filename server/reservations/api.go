@@ -1,8 +1,11 @@
 package reservations
 
+import "github.com/bks71/traintix/pb"
+
 type ReservationSystem interface {
-	ReserveSeat(Passenger) (*Reservation, error)
-	GetReservation(Passenger) (*Reservation, error)
-	CancelReservation(Passenger) error
-	ChangeSeat(Passenger, Seat) (*Reservation, error)
+	ReserveSeat(*pb.Passenger) (*pb.Reservation, error)
+	GetReservation(*pb.Passenger) (*pb.Reservation, error)
+	CancelReservation(*pb.Passenger) error
+	ChangeSeat(*pb.Passenger, *pb.Seat) (*pb.Reservation, error)
+	GetReservationsBySection(sectionName string) []*pb.Reservation
 }

@@ -7,93 +7,60 @@ package pb;
 
 // Ticketing service definition
 service Ticketing {
-  
-  // Public API where you can submit a purchase for a ticket
-  rpc Purchase (PurchaseRequest) returns (PurchaseResponse) {}
-
-  // Authenticated API that shows the details of the receipt for the user
-  rpc ViewReservation (ViewReservationRequest) returns (ViewReservationResponse) {}
-
-  // authenticated API that lets an admin view all the users and seats they are allocated by the requested section
-  rpc ViewAllReservations (ViewAllReservationsRequest) returns (ViewAllReservationsResponse) {}
-
-  // authenticated API to allow an admin or the user to remove the user from the train
-  rpc CancelReservation (CancelReservationRequest) returns (CancelReservationResponse) {}
-
-  rpc ChangeSeat (ChangeSeatRequest) returns (ChangeSeatResponse) {}
+  rpc Purchase (PurchaseRequest) returns (TicketingResponse) {}
+  rpc GetReservation (GetReservationRequest) returns (TicketingResponse) {}
+  rpc GetReservationsBySection (GetReservationsBySectionRequest) returns (TicketingResponse) {}
+  rpc CancelReservation (CancelReservationRequest) returns (TicketingResponse) {}
+  rpc ChangeSeat (ChangeSeatRequest) returns (TicketingResponse) {}
 }
 
-// User info
-message User {
+// Ticketing domain model
+message Passenger {
   string first_name = 1;
   string last_name = 2;
   string email = 3;
 }
 
-// Seat info
 message Seat {
-  int32 seat_number = 1;
+  int32 number = 1;
   string section = 2;
 }
 
-// Purchase request message
-message PurchaseRequest {
-  User user = 1;
-}
-
-message Receipt {
+message Reservation {
   string from = 1;
   string to = 2;
-  User user = 3;
+  Passenger passenger = 3;
   float price = 4;
   Seat seat = 5;
 }
 
-// Purchase Response message
-message PurchaseResponse {
-  Receipt receipt = 1;
+// Request messages
+message PurchaseRequest {
+  Passenger passenger = 1;
 }
 
-// View Reservation Request message
-message ViewReservationRequest {
-  string user = 1;
+message GetReservationRequest {
+  Passenger passenger = 1;
 }
 
-// View Reservation Response message
-message ViewReservationResponse {
-  string seat = 1;
-  float price = 2; 
-}
-
-// View All Reservations Request message
-message ViewAllReservationsRequest {
+message GetReservationsBySectionRequest {
   string section = 1;
 }
 
-// View All Reservations Response message
-message ViewAllReservationsResponse {
-  repeated Seat seat = 1;
-  repeated User user = 2;
-}
-
-// Cancel Reservation Request message
 message CancelReservationRequest {
-  User user = 1;
+  Passenger passenger = 1;
 }
 
-// Cancel Reservation Response message
-message CancelReservationResponse {
-}
-
-// Change Seat Request message
 message ChangeSeatRequest {
-  User user = 1;
-  Seat seat = 2; //new seat
+  Passenger passenger = 1;
+  Seat seat = 2; //requested seat
 }
 
-// Change Seat Response message
-message ChangeSeatResponse {
+//Response messages
+message TicketingResponse {
+  repeated Reservation reservation = 1;
 }
+
 
 
 

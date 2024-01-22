@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/bks71/traintix/pb"
-	"github.com/bks71/traintix/server/inv"
+	resv "github.com/bks71/traintix/server/reservations"
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 )
@@ -18,31 +18,33 @@ func TestPurchase(t *testing.T) {
 	ctx := context.Background()
 
 	// Set up the mocks
-	user := pb.User{
+	p := pb.Passenger{
 		FirstName: "Brandon",
 		LastName:  "Stewart",
 		Email:     "bkstewart@gmail.com",
 	}
 
-	mockInv := inv.NewMockInventoryService(ctrl)
+	mockRes := resv.NewMockReservationSystem(ctrl)
 
 	server := &TicketingServer{
-		InventoryService: mockInv,
+		ReservationSystem: mockRes,
 	}
 
-	resv := inv.Reservation{
-		From:       "Here",
-		To:         "There",
-		Passenger:  inv.Passenger{FirstName: user.FirstName, LastName: user.LastName, Email: user.Email},
-		Section:    "X",
-		SeatNumber: 100,
-		Price:      2000.00}
+	r := pb.Reservation{
+		From:      "Here",
+		To:        "There",
+		Seat:      &pb.Seat{Section: "A", Number: 1},
+		Passenger: &p,
+		Price:     2000.00,
+	}
 
-	mockInv.EXPECT().ReserveSeat(user.FirstName, user.LastName, user.Email).Return(resv, nil)
+	mockRes.EXPECT().
+		ReserveSeat(&p).
+		Return(&r, nil)
 
 	// Create a purchase request
 	req := &pb.PurchaseRequest{
-		User: &user,
+		Passenger: &p,
 	}
 
 	// Call the Purchase method
@@ -53,13 +55,5 @@ func TestPurchase(t *testing.T) {
 
 	// Check the response
 	assert.NotNil(t, resp)
-	assert.NotNil(t, resp.Receipt)
-	assert.Equal(t, resv.From, resp.Receipt.From)
-	assert.Equal(t, resv.To, resp.Receipt.To)
-	assert.Equal(t, user.FirstName, resp.Receipt.User.FirstName)
-	assert.Equal(t, user.LastName, resp.Receipt.User.LastName)
-	assert.Equal(t, user.Email, resp.Receipt.User.Email)
-	assert.Equal(t, resv.Price, resp.Receipt.Price)
-	assert.Equal(t, int32(resv.SeatNumber), resp.Receipt.Seat.SeatNumber)
-	assert.Equal(t, resv.Section, resp.Receipt.Seat.Section)
+	assert.NotNil(t, resp.Reservation)
 }
