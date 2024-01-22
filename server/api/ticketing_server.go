@@ -45,7 +45,7 @@ func (s *TicketingServer) Purchase(ctx context.Context, in *pb.PurchaseRequest) 
 func (s *TicketingServer) GetReservation(ctx context.Context, in *pb.GetReservationRequest) (*pb.TicketingResponse, error) {
 	log.Printf("%v", in)
 
-	r, err := s.ReservationSystem.GetReservation(in.Passenger)
+	r, err := s.ReservationSystem.GetReservation(in.Email)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +76,7 @@ func (s *TicketingServer) GetReservationsBySection(ctx context.Context, in *pb.G
 func (s *TicketingServer) ChangeSeat(ctx context.Context, in *pb.ChangeSeatRequest) (*pb.TicketingResponse, error) {
 	log.Printf("%v", in)
 
-	r, err := s.ReservationSystem.ChangeSeat(in.Passenger, in.Seat)
+	r, err := s.ReservationSystem.ChangeSeat(in.Email, in.Seat)
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func (s *TicketingServer) ChangeSeat(ctx context.Context, in *pb.ChangeSeatReque
 func (s *TicketingServer) CancelReservation(ctx context.Context, in *pb.CancelReservationRequest) (*pb.TicketingResponse, error) {
 	log.Printf("%v", in)
 
-	r, err := s.ReservationSystem.CancelReservation(in.Passenger)
+	r, err := s.ReservationSystem.CancelReservation(in.Email)
 	if err != nil {
 		return nil, err
 	}

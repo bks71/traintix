@@ -6,31 +6,12 @@ import (
 	"github.com/bks71/traintix/pb"
 )
 
-// type Seat struct {
-// 	Section string
-// 	Number  int
-// }
-
-// type Reservation struct {
-// 	Passenger Passenger
-// 	From      string
-// 	To        string
-// 	Price     float32
-// 	Seat      Seat
-// }
-
-// type Passenger struct {
-// 	FirstName string
-// 	LastName  string
-// 	Email     string
-// }
-
 type ResvSys struct {
 	// Available seats
 	openSeats []*pb.Seat
 
 	// Map of emails to reservations
-	passengers map[string]*pb.Reservation
+	reservations map[string]*pb.Reservation
 }
 
 func NewReservationSystem() *ResvSys {
@@ -57,7 +38,7 @@ func NewReservationSystem() *ResvSys {
 			{Section: "B", Number: 9},
 			{Section: "B", Number: 10},
 		},
-		passengers: make(map[string]*pb.Reservation),
+		reservations: make(map[string]*pb.Reservation),
 	}
 }
 
@@ -74,7 +55,7 @@ func (resv *ResvSys) reserveAnySeat() (*pb.Seat, error) {
 func (resv *ResvSys) ReserveSeat(p *pb.Passenger) (*pb.Reservation, error) {
 
 	//check for an existing reservation for this passenger
-	if r, exists := resv.passengers[p.Email]; exists {
+	if r, exists := resv.reservations[p.Email]; exists {
 		return r, errors.New("sorry this email address already has a reservation")
 	}
 
@@ -92,27 +73,27 @@ func (resv *ResvSys) ReserveSeat(p *pb.Passenger) (*pb.Reservation, error) {
 		Price:     20.00,
 		Seat:      s,
 	}
-	resv.passengers[p.Email] = &r
+	resv.reservations[p.Email] = &r
 
 	return &r, nil
 }
 
-func (resv *ResvSys) GetReservation(p *pb.Passenger) (*pb.Reservation, error) {
-	if r, exists := resv.passengers[p.Email]; exists {
+func (resv *ResvSys) GetReservation(email string) (*pb.Reservation, error) {
+	if r, exists := resv.reservations[email]; exists {
 		return r, nil
 	}
 	return nil, errors.New("no reservation found")
 }
 
-func (resv *ResvSys) CancelReservation(p *pb.Passenger) (*pb.Reservation, error) {
-	if r, exists := resv.passengers[p.Email]; exists {
+func (resv *ResvSys) CancelReservation(email string) (*pb.Reservation, error) {
+	if r, exists := resv.reservations[email]; exists {
 		//TODO test this
 
 		// put the seat back into the inventory
 		resv.openSeats = append(resv.openSeats, r.Seat)
 
 		// remove the passenger/reservation from the map
-		delete(resv.passengers, p.Email)
+		delete(resv.reservations, email)
 
 		// remove the passenger from the reservation and return it
 		r.Passenger = nil
@@ -122,9 +103,9 @@ func (resv *ResvSys) CancelReservation(p *pb.Passenger) (*pb.Reservation, error)
 	return nil, errors.New("no reservation found")
 }
 
-func (resv *ResvSys) ChangeSeat(p *pb.Passenger, s *pb.Seat) (*pb.Reservation, error) {
+func (resv *ResvSys) ChangeSeat(email string, s *pb.Seat) (*pb.Reservation, error) {
 
-	r, exists := resv.passengers[p.Email]
+	r, exists := resv.reservations[email]
 	if !exists {
 		return nil, errors.New("no reservation found for this email address")
 	}
@@ -147,7 +128,7 @@ func (resv *ResvSys) ChangeSeat(p *pb.Passenger, s *pb.Seat) (*pb.Reservation, e
 
 func (resv *ResvSys) GetReservationsBySection(sectionName string) []*pb.Reservation {
 	var res []*pb.Reservation
-	for _, r := range resv.passengers {
+	for _, r := range resv.reservations {
 		if r.Seat.Section == sectionName {
 			res = append(res, r)
 		}

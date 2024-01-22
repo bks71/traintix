@@ -14,8 +14,8 @@ goimports -w client/ server/
 
 TODO
 
-* makefile
-* implement auth
-* test client
-* finish API methods
-* Postman test scripts
+* [ ] makefile
+* [ ] implement auth
+* [ ] test client
+* [ ] finish API methods
+* [ ] Postman test scripts (or grpcurl)

@@ -58,7 +58,7 @@ func TestResvSystem(t *testing.T) {
 			t.Errorf("Error reserving a seat: %v", err)
 		}
 
-		savedRes, err := resv.GetReservation(p)
+		savedRes, err := resv.GetReservation(p.Email)
 		if err != nil {
 			t.Errorf("Error retrieving a reservation: %v", err)
 		}
@@ -77,7 +77,7 @@ func TestResvSystem(t *testing.T) {
 			t.Errorf("Error reserving a seat: %v", err)
 		}
 
-		r, err := resv.CancelReservation(p)
+		r, err := resv.CancelReservation(p.Email)
 		if err != nil {
 			t.Errorf("Error canceling a reservation: %v", err)
 		}
@@ -89,12 +89,12 @@ func TestResvSystem(t *testing.T) {
 		resv := NewReservationSystem()
 
 		// check for error on get
-		_, errGet := resv.GetReservation(randomPassenger())
+		_, errGet := resv.GetReservation(randomPassenger().Email)
 		assert.Error(t, errGet)
 		t.Log(errGet)
 
 		// check for error on cancel
-		_, errCancel := resv.CancelReservation(randomPassenger())
+		_, errCancel := resv.CancelReservation(randomPassenger().Email)
 		assert.Error(t, errCancel)
 		t.Log(errCancel)
 	})
@@ -110,20 +110,68 @@ func TestResvSystem(t *testing.T) {
 		}
 
 		// test that passenger can't change to the same seat
-		r2, err := resv.ChangeSeat(p, r.Seat)
+		r2, err := resv.ChangeSeat(p.Email, r.Seat)
 		assert.Error(t, err)
 		assert.Equal(t, r, r2)
 		t.Log(err)
 
 		// change the seat
 		newSeat := &pb.Seat{Number: 2, Section: "A"}
-		newRes, err := resv.ChangeSeat(p, newSeat)
+		newRes, err := resv.ChangeSeat(p.Email, newSeat)
 		if err != nil {
 			t.Errorf("Error changing a seat: %v", err)
 		}
 
 		assert.Equal(t, newSeat.Number, newRes.Seat.Number)
 		assert.Equal(t, newSeat.Section, newRes.Seat.Section)
+	})
+
+	t.Run("Fill the train, do some cancels, etc.", func(t *testing.T) {
+		resv := NewReservationSystem()
+
+		passengers := make([]*pb.Passenger, 0)
+
+		// add 20 passengers
+		for i := 0; i < 20; i++ {
+			passengers = append(passengers, randomPassenger())
+			_, err := resv.ReserveSeat(passengers[i])
+			if err != nil {
+				t.Errorf("Error reserving a seat: %v", err)
+			}
+		}
+
+		// do some cancels
+		_, err := resv.CancelReservation(passengers[0].Email)
+		if err != nil {
+			t.Errorf("Error cancelling: %v", err)
+		}
+
+		_, err = resv.CancelReservation(passengers[1].Email)
+		if err != nil {
+			t.Errorf("Error cancelling: %v", err)
+		}
+
+		_, err = resv.CancelReservation(passengers[9].Email)
+		if err != nil {
+			t.Errorf("Error cancelling: %v", err)
+		}
+
+		_, err = resv.CancelReservation(passengers[10].Email)
+		if err != nil {
+			t.Errorf("Error cancelling: %v", err)
+		}
+
+		_, err = resv.CancelReservation(passengers[19].Email)
+		if err != nil {
+			t.Errorf("Error cancelling: %v", err)
+		}
+
+		r, err := resv.ReserveSeat(passengers[0])
+		if err != nil {
+			t.Errorf("Error reserving a seat: %v", err)
+		}
+		assert.True(t, r.Seat != nil)
+
 	})
 
 }

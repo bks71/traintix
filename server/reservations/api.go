@@ -4,8 +4,8 @@ import "github.com/bks71/traintix/pb"
 
 type ReservationSystem interface {
 	ReserveSeat(*pb.Passenger) (*pb.Reservation, error)
-	GetReservation(*pb.Passenger) (*pb.Reservation, error)
-	CancelReservation(*pb.Passenger) (*pb.Reservation, error)
-	ChangeSeat(*pb.Passenger, *pb.Seat) (*pb.Reservation, error)
+	GetReservation(email string) (*pb.Reservation, error)
+	CancelReservation(email string) (*pb.Reservation, error)
+	ChangeSeat(email string, seat *pb.Seat) (*pb.Reservation, error)
 	GetReservationsBySection(sectionName string) []*pb.Reservation
 }

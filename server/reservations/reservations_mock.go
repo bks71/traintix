@@ -35,48 +35,48 @@ func (m *MockReservationSystem) EXPECT() *MockReservationSystemMockRecorder {
 }
 
 // CancelReservation mocks base method.
-func (m *MockReservationSystem) CancelReservation(arg0 *pb.Passenger) (*pb.Reservation, error) {
+func (m *MockReservationSystem) CancelReservation(email string) (*pb.Reservation, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "CancelReservation", arg0)
+	ret := m.ctrl.Call(m, "CancelReservation", email)
 	ret0, _ := ret[0].(*pb.Reservation)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // CancelReservation indicates an expected call of CancelReservation.
-func (mr *MockReservationSystemMockRecorder) CancelReservation(arg0 interface{}) *gomock.Call {
+func (mr *MockReservationSystemMockRecorder) CancelReservation(email interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CancelReservation", reflect.TypeOf((*MockReservationSystem)(nil).CancelReservation), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CancelReservation", reflect.TypeOf((*MockReservationSystem)(nil).CancelReservation), email)
 }
 
 // ChangeSeat mocks base method.
-func (m *MockReservationSystem) ChangeSeat(arg0 *pb.Passenger, arg1 *pb.Seat) (*pb.Reservation, error) {
+func (m *MockReservationSystem) ChangeSeat(email string, seat *pb.Seat) (*pb.Reservation, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "ChangeSeat", arg0, arg1)
+	ret := m.ctrl.Call(m, "ChangeSeat", email, seat)
 	ret0, _ := ret[0].(*pb.Reservation)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // ChangeSeat indicates an expected call of ChangeSeat.
-func (mr *MockReservationSystemMockRecorder) ChangeSeat(arg0, arg1 interface{}) *gomock.Call {
+func (mr *MockReservationSystemMockRecorder) ChangeSeat(email, seat interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ChangeSeat", reflect.TypeOf((*MockReservationSystem)(nil).ChangeSeat), arg0, arg1)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ChangeSeat", reflect.TypeOf((*MockReservationSystem)(nil).ChangeSeat), email, seat)
 }
 
 // GetReservation mocks base method.
-func (m *MockReservationSystem) GetReservation(arg0 *pb.Passenger) (*pb.Reservation, error) {
+func (m *MockReservationSystem) GetReservation(email string) (*pb.Reservation, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetReservation", arg0)
+	ret := m.ctrl.Call(m, "GetReservation", email)
 	ret0, _ := ret[0].(*pb.Reservation)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetReservation indicates an expected call of GetReservation.
-func (mr *MockReservationSystemMockRecorder) GetReservation(arg0 interface{}) *gomock.Call {
+func (mr *MockReservationSystemMockRecorder) GetReservation(email interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetReservation", reflect.TypeOf((*MockReservationSystem)(nil).GetReservation), arg0)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetReservation", reflect.TypeOf((*MockReservationSystem)(nil).GetReservation), email)
 }
 
 // GetReservationsBySection mocks base method.

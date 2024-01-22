@@ -40,7 +40,7 @@ message PurchaseRequest {
 }
 
 message GetReservationRequest {
-  Passenger passenger = 1;
+  string email = 1;
 }
 
 message GetReservationsBySectionRequest {
@@ -48,11 +48,11 @@ message GetReservationsBySectionRequest {
 }
 
 message CancelReservationRequest {
-  Passenger passenger = 1;
+  string email = 1;
 }
 
 message ChangeSeatRequest {
-  Passenger passenger = 1;
+  string email = 1;
   Seat seat = 2; //requested seat
 }
 
