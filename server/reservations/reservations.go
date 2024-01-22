@@ -42,16 +42,6 @@ func NewReservationSystem() *ResvSys {
 	}
 }
 
-func (resv *ResvSys) reserveAnySeat() (*pb.Seat, error) {
-	if len(resv.openSeats) == 0 {
-		return nil, errors.New("no seats available")
-	}
-	i := resv.openSeats
-	s := i[len(i)-1]
-	resv.openSeats = i[:len(i)-1]
-	return s, nil
-}
-
 func (resv *ResvSys) ReserveSeat(p *pb.Passenger) (*pb.Reservation, error) {
 
 	//check for an existing reservation for this passenger
@@ -59,11 +49,12 @@ func (resv *ResvSys) ReserveSeat(p *pb.Passenger) (*pb.Reservation, error) {
 		return r, errors.New("sorry this email address already has a reservation")
 	}
 
-	//Find an empty seat
-	s, err := resv.reserveAnySeat()
-	if err != nil {
-		return nil, err
+	//Find an empty seat - just remove the last one in the openSeat list
+	if len(resv.openSeats) == 0 {
+		return nil, errors.New("no seats available")
 	}
+	s := resv.openSeats[len(resv.openSeats)-1]
+	resv.openSeats = resv.openSeats[:len(resv.openSeats)-1]
 
 	//Reserve it
 	r := pb.Reservation{
@@ -87,8 +78,6 @@ func (resv *ResvSys) GetReservation(email string) (*pb.Reservation, error) {
 
 func (resv *ResvSys) CancelReservation(email string) (*pb.Reservation, error) {
 	if r, exists := resv.reservations[email]; exists {
-		//TODO test this
-
 		// put the seat back into the inventory
 		resv.openSeats = append(resv.openSeats, r.Seat)
 
