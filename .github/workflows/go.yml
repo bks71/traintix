@@ -31,4 +31,5 @@ jobs:
       run: go vet -v ./...
 
     - name: Staticcheck
-      run: staticcheck -v ./...
+      uses: dominikh/staticcheck-action@v1.2.0
+
