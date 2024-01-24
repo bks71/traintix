@@ -39,7 +39,6 @@ func (s *TicketingServer) Purchase(ctx context.Context, in *pb.PurchaseRequest) 
 	log.Printf("%v", resp)
 
 	return resp, nil
-
 }
 
 func (s *TicketingServer) GetReservation(ctx context.Context, in *pb.GetReservationRequest) (*pb.TicketingResponse, error) {

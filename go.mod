@@ -3,6 +3,7 @@ module github.com/bks71/traintix
 go 1.21.5
 
 require (
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/golang/mock v1.6.0
 	github.com/stretchr/testify v1.8.4
 	google.golang.org/grpc v1.60.1
@@ -17,6 +18,7 @@ require (
 
 require (
 	github.com/golang/protobuf v1.5.3 // indirect
+	github.com/grpc-ecosystem/go-grpc-middleware v1.4.0
 	github.com/xyproto/randomstring v1.0.5
 	golang.org/x/net v0.20.0 // indirect
 	golang.org/x/sys v0.16.0 // indirect
